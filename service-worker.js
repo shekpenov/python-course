@@ -1,10 +1,13 @@
-const CACHE_NAME = 'python-course-v7';
+const CACHE_NAME = 'python-course-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
   '/css/style.css',
+  '/css/profile.css',
   '/js/app.js',
+  '/js/profile.js',
+  '/profile.html',
   '/js/pyodide-runner.js',
   '/js/progress.js',
   '/icons/icon.svg',

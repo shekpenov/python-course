@@ -97,7 +97,7 @@ print(f"Символов (без пробелов): {kol_simvolov}")`
       test: (out, code) => out.trim() === '150' && code.includes('open(')
     },
     {
-      prompt: 'Файл <code>/data/students.txt</code> содержит данные студентов в формате <em>Имя,Балл</em>. Прочитайте файл и выведите количество строк (студентов). Ожидаемый ответ: <em>5</em>.',
+      prompt: 'Файл <code>/data/students.txt</code> уже загружен — он содержит 5 студентов в формате <em>Имя,Балл</em>. Прочитайте его и выведите количество строк. Ожидаемый ответ: <em>5</em>.',
       starterCode: `# ваш код здесь
 `,
       solution: `with open('/data/students.txt', 'r', encoding='utf-8') as f:\n    lines = f.readlines()\nprint(len(lines))`,
@@ -105,7 +105,7 @@ print(f"Символов (без пробелов): {kol_simvolov}")`
       test: (out, code) => out.trim() === '5' && code.includes('open(')
     },
     {
-      prompt: 'Файл <code>/data/students.txt</code> содержит строки вида <em>Имя,Балл</em>. Найдите и выведите имя студента с наибольшим баллом. Ожидаемый ответ: <em>Алия</em>.',
+      prompt: 'Файл <code>/data/students.txt</code> уже загружен — строки вида <em>Имя,Балл</em>. Найдите и выведите имя студента с наибольшим баллом. Ожидаемый ответ: <em>Алия</em>.',
       starterCode: `# ваш код здесь
 `,
       solution: `best_name = ''\nbest_score = 0\nwith open('/data/students.txt', 'r', encoding='utf-8') as f:\n    for line in f:\n        name, score = line.strip().split(',')\n        if int(score) > best_score:\n            best_score = int(score)\n            best_name = name\nprint(best_name)`,

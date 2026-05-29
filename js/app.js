@@ -1,6 +1,12 @@
 import { getTopicProgress, setTaskPassed, isTaskPassed, getCompletedCount,
-         getTotalXP, addXP, getLevelInfo, isTopicUnlocked, LEVELS } from './progress.js';
+         isTopicUnlocked } from './progress.js';
+import * as Profile from './profile.js';
 import { runPython } from './pyodide-runner.js';
+
+// Алиасы для удобства (Profile теперь главный источник XP/уровней)
+const addXP      = (a, r) => Profile.addXP(a, r);
+const getLevelInfo = ()   => Profile.getLevelInfo();
+const LEVELS     = Profile.LEVELS;
 
 const TOPICS = [
   { id: 'topic-basics', code: '7.1',     title: 'Основы Python',                            group: 'Основы'     },
@@ -25,6 +31,8 @@ const GROUP_ORDER = ['Основы', 'Условия', 'Циклы', 'Алгор
 const GROUP_EMOJI = { 'Основы': '🐍', 'Условия': '🔀', 'Циклы': '🔄', 'Алгоритмы': '🧮', 'Массивы': '📋', 'Файлы': '📁', 'Функции': '⚡' };
 
 let currentTopic = null;
+// Отслеживаем первую попытку: taskId → boolean (true = ещё не пытались)
+const _firstAttempt = new Map();
 
 // ──────────────────────── SIDEBAR ────────────────────────
 function buildSidebar() {
@@ -97,24 +105,19 @@ function updateProgressUI() {
 }
 
 function updateXPUI() {
-  const { current, next, xp, pct } = getLevelInfo();
-  const badge = document.getElementById('level-badge');
-  const nameEl = document.getElementById('level-name');
-  const xpFill = document.getElementById('xp-bar-fill');
-  const xpText = document.getElementById('xp-text');
-  if (badge) badge.textContent = `Ур. ${current.level}`;
-  if (nameEl) nameEl.textContent = current.name;
-  if (xpFill) xpFill.style.width = pct + '%';
-  if (xpText) xpText.textContent = next ? `${xp - current.xp} / ${next.xp - current.xp} XP` : 'MAX';
+  Profile.updateMiniCard();
 }
 
-function showXPPopup(amount, levelUp, levelName) {
-  const el = document.createElement('div');
-  el.className = 'xp-popup' + (levelUp ? ' levelup' : '');
-  el.textContent = levelUp ? `🎉 Уровень повышен! ${levelName}` : `+${amount} XP`;
-  document.body.appendChild(el);
-  setTimeout(() => el.classList.add('visible'), 10);
-  setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 400); }, 2000);
+function showXPPopup(amount, levelUp) {
+  // level-up уже обрабатывается в profile.js через _showLevelUpAnimation
+  if (!levelUp) {
+    const el = document.createElement('div');
+    el.className = 'xp-popup';
+    el.textContent = `+${amount} XP`;
+    document.body.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 10);
+    setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 400); }, 2000);
+  }
 }
 
 // ──────────────────────── ROUTER ────────────────────────
@@ -162,6 +165,9 @@ async function loadTopic(topicId) {
   document.getElementById('practice-content').innerHTML = '';
 
   window.scrollTo(0, 0);
+
+  // Начислить XP за первый просмотр темы
+  Profile.recordTopicView(topicId);
 
   try {
     const mod = await import(`/modules/${topicId}.js`);
@@ -231,6 +237,8 @@ async function runExample(i, examples) {
 
   btn.disabled = true;
   btn.textContent = '⏳ Выполнение...';
+
+  Profile.recordExampleRun(); // +5 XP (и +20 XP разово за первый запуск)
 
   const { output, error } = await runPython(examples[i].code);
 
@@ -340,6 +348,7 @@ async function runSpExample(si, sections) {
   const outEl = document.getElementById(`sp-out-${si}`);
   const textEl = document.getElementById(`sp-out-text-${si}`);
   btn.disabled = true; btn.textContent = '⏳ Выполнение...';
+  Profile.recordExampleRun(); // +5 XP
   const { output, error } = await runPython(sections[si].example.code);
   btn.disabled = false; btn.textContent = '▶ Запустить';
   outEl.classList.add('visible');
@@ -357,8 +366,15 @@ async function runSpTask(si) {
 
 async function checkSpTask(si) {
   const task = currentTopic.sections[si].task;
+  const key = `sp-${currentTopic.id}-${si}`;
   const btn = document.querySelector(`[data-sp-check="${si}"]`);
   btn.disabled = true; btn.textContent = '⏳...';
+
+  if (!_firstAttempt.has(key)) {
+    _firstAttempt.set(key, true);
+    Profile.recordTaskStart();
+  }
+
   const code = document.getElementById(`sp-editor-${si}`).value;
   const { output, error } = await runPython(code);
   btn.disabled = false; btn.textContent = '✓ Проверить';
@@ -379,13 +395,25 @@ async function checkSpTask(si) {
     document.getElementById(`sp-dot-label-${si}`).textContent = 'Выполнено ✓';
     document.getElementById(`sp-task-${si}`).classList.add('task-done');
     setTaskPassed(currentTopic.id, si, currentTopic.sections.length);
-    const xpAmount = task.xp || (task.practice ? 20 : 10);
-    const { levelUp, newLevel } = addXP(xpAmount);
+
+    const key = `sp-${currentTopic.id}-${si}`;
+    const wasFirstAttempt = _firstAttempt.get(key) === true;
+    _firstAttempt.set(key, false);
+
+    const completedTotal = getCompletedCount(ALL_IDS);
+    const result = Profile.recordTaskCompleted(wasFirstAttempt, completedTotal);
+
+    // Тема завершена? (все секции пройдены)
+    const allSectionsDone = currentTopic.sections.every((_, idx) =>
+      isTaskPassed(currentTopic.id, idx) || !currentTopic.sections[idx].task
+    );
+    if (allSectionsDone) Profile.recordTopicCompleted(completedTotal);
+
     updateProgressUI();
     refreshNav();
     const solEl = document.getElementById(`sp-solution-${si}`);
     if (solEl) { solEl.hidden = false; if (window.Prism) Prism.highlightAllUnder(solEl); }
-    showXPPopup(xpAmount, levelUp, levelUp ? LEVELS.find(l => l.level === newLevel)?.name : '');
+    showXPPopup(task.xp || 30, result?.levelUp || false);
     checkPracticeUnlock();
   }
 }
@@ -485,8 +513,16 @@ async function execTaskRun(i) {
 
 async function execTaskCheck(i) {
   const task = currentTopic.tasks[i];
+  const key = `${currentTopic.id}-${i}`;
   const btn = document.querySelector(`[data-task-check="${i}"]`);
   btn.disabled = true; btn.textContent = '⏳...';
+
+  // Зафиксировать начало (для Спидраннера) при первой попытке
+  if (!_firstAttempt.has(key)) {
+    _firstAttempt.set(key, true);
+    Profile.recordTaskStart();
+  }
+
   const code = document.getElementById(`editor-${i}`).value;
   const { output, error } = await runPython(code);
   btn.disabled = false; btn.textContent = '✓ Проверить';
@@ -511,12 +547,19 @@ async function execTaskCheck(i) {
     document.getElementById(`dot-label-${i}`).textContent = 'Выполнено ✓';
     document.getElementById(`task-${i}`).classList.add('task-done');
     setTaskPassed(currentTopic.id, i, currentTopic.tasks.length);
-    const xpAmount = task.xp || 15;
-    const { levelUp, newLevel } = addXP(xpAmount);
+
+    const key = `${currentTopic.id}-${i}`;
+    const wasFirstAttempt = _firstAttempt.get(key) === true;
+    _firstAttempt.set(key, false); // уже не первая
+
+    const completedTotal = getCompletedCount(ALL_IDS);
+    const result = Profile.recordTaskCompleted(wasFirstAttempt, completedTotal);
+    if (completedTotal >= 14) Profile.recordTopicCompleted(completedTotal);
+
     updateProgressUI();
     refreshNav();
     showSolution(i);
-    showXPPopup(xpAmount, levelUp, levelUp ? LEVELS.find(l => l.level === newLevel)?.name : '');
+    showXPPopup(30, result?.levelUp || false);
   }
 }
 
@@ -560,6 +603,20 @@ function esc(str) {
 
 // ──────────────────────── INIT ────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+  // Инициализировать профиль (покажет модал при первом запуске)
+  Profile.init();
+
+  // Заполнить кнопки аватаров в модале создания профиля
+  const AVATARS = ['🐍','🤖','🦊','🐼','🦁','🐧'];
+  const setupGrid = document.getElementById('setup-avatar-grid');
+  if (setupGrid) {
+    setupGrid.innerHTML = AVATARS.map(a => `
+      <button class="avatar-btn${a === '🐍' ? ' selected' : ''}"
+              data-avatar="${a}"
+              onclick="Profile._selectAvatar('${a}')">${a}</button>
+    `).join('');
+  }
+
   buildSidebar();
   updateProgressUI();
 

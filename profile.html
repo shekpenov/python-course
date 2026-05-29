@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#7c5ef6">
+  <title>Профиль — Python Курс</title>
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/profile.css">
+</head>
+<body class="profile-page">
+
+  <!-- ── ШАПКА ── -->
+  <header class="pf-header">
+    <a href="index.html" class="pf-back">← Вернуться к курсу</a>
+    <button class="pf-edit-btn" id="edit-btn">✏️ Изменить профиль</button>
+  </header>
+
+  <!-- ── ГЕРОЙ: аватар, имя, уровень ── -->
+  <section class="pf-hero">
+    <div class="pf-avatar-wrap" id="pf-avatar">🐍</div>
+    <div class="pf-hero-info">
+      <h1 id="pf-username">Ученик</h1>
+      <div class="pf-level-badge" id="pf-level-badge">Уровень 1 · Новичок</div>
+      <div class="pf-meta" id="pf-meta">Дата регистрации: —</div>
+    </div>
+  </section>
+
+  <!-- ── XP ПРОГРЕСС ── -->
+  <section class="pf-card pf-xp-section">
+    <div class="pf-xp-header">
+      <span id="pf-xp-total">0 XP</span>
+      <span id="pf-xp-next">До следующего уровня: — XP</span>
+    </div>
+    <div class="pf-xp-bar">
+      <div class="pf-xp-fill" id="pf-xp-fill"></div>
+    </div>
+    <div class="pf-level-labels">
+      <span id="pf-cur-level-name">Новичок</span>
+      <span id="pf-next-level-name">Ученик</span>
+    </div>
+  </section>
+
+  <!-- ── СТАТИСТИКА ── -->
+  <section class="pf-card">
+    <h2 class="pf-section-title">📊 Статистика</h2>
+    <div class="pf-stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🔥</div>
+        <div class="stat-value" id="stat-streak">0</div>
+        <div class="stat-label">Дней подряд</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value" id="stat-days">0</div>
+        <div class="stat-label">Дней в курсе</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📚</div>
+        <div class="stat-value" id="stat-topics">0</div>
+        <div class="stat-label">Тем пройдено</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-value" id="stat-tasks">0</div>
+        <div class="stat-label">Заданий выполнено</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">▶️</div>
+        <div class="stat-value" id="stat-runs">0</div>
+        <div class="stat-label">Запусков кода</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-value" id="stat-badges">0 / 8</div>
+        <div class="stat-label">Достижений</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── АЧИВКИ ── -->
+  <section class="pf-card">
+    <h2 class="pf-section-title">🏅 Достижения</h2>
+    <div class="pf-badges-grid" id="badges-grid">
+      <!-- Заполняется через JS -->
+    </div>
+  </section>
+
+  <!-- ── МОДАЛЬНОЕ ОКНО РЕДАКТИРОВАНИЯ ── -->
+  <div id="edit-modal" class="pf-modal-overlay" hidden>
+    <div class="pf-modal-card">
+      <h2>Изменить профиль</h2>
+      <label class="pf-label">Имя</label>
+      <input type="text" id="edit-name-input" class="pf-input" maxlength="30" placeholder="Ваше имя">
+      <label class="pf-label">Аватар</label>
+      <div class="avatar-grid" id="edit-avatar-grid"></div>
+      <div class="pf-modal-actions">
+        <button class="pf-btn-secondary" onclick="document.getElementById('edit-modal').hidden=true">Отмена</button>
+        <button class="pf-btn-primary" id="save-edit-btn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import * as Profile from './js/profile.js';
+    import { getTopicProgress } from './js/progress.js';
+
+    const AVATARS = ['🐍','🤖','🦊','🐼','🦁','🐧'];
+    const TOTAL_TOPICS = 14;
+    let _selectedAvatar = '🐍';
+
+    // ── Заполнить страницу ──────────────────────
+    function render() {
+      const p = Profile.getProfile();
+      if (!p) {
+        window.location.href = 'index.html';
+        return;
+      }
+      const info = Profile.getLevelInfo();
+
+      document.getElementById('pf-avatar').textContent  = p.avatar;
+      document.getElementById('pf-username').textContent = p.username;
+      document.getElementById('pf-level-badge').textContent =
+        `Уровень ${info.level} · ${info.name}`;
+
+      // Дата регистрации
+      const reg = new Date(p.registeredAt).toLocaleDateString('ru-RU', {
+        day: 'numeric', month: 'long', year: 'numeric'
+      });
+      document.getElementById('pf-meta').textContent = `Регистрация: ${reg}`;
+
+      // XP бар
+      document.getElementById('pf-xp-total').textContent = `${info.xp} XP`;
+      document.getElementById('pf-xp-fill').style.width  = info.pct + '%';
+      document.getElementById('pf-cur-level-name').textContent = info.name;
+
+      if (info.nextName) {
+        document.getElementById('pf-next-level-name').textContent = info.nextName;
+        document.getElementById('pf-xp-next').textContent =
+          `До «${info.nextName}»: ${info.xpNeeded - info.xpInLevel} XP`;
+      } else {
+        document.getElementById('pf-next-level-name').textContent = '🏆 MAX';
+        document.getElementById('pf-xp-next').textContent = 'Максимальный уровень!';
+      }
+
+      // Статистика
+      const daysSince = Math.floor(
+        (Date.now() - new Date(p.registeredAt)) / 86400000
+      );
+      document.getElementById('stat-streak').textContent  = p.streak;
+      document.getElementById('stat-days').textContent    = daysSince + 1;
+      document.getElementById('stat-topics').textContent  = p.stats.topicsCompleted;
+      document.getElementById('stat-tasks').textContent   = p.stats.tasksCompleted;
+      document.getElementById('stat-runs').textContent    = p.stats.codeRuns;
+      document.getElementById('stat-badges').textContent  =
+        `${p.achievements.length} / ${Object.keys(Profile.ACHIEVEMENTS).length}`;
+
+      // Ачивки
+      renderBadges(p.achievements);
+    }
+
+    function renderBadges(unlocked) {
+      const grid = document.getElementById('badges-grid');
+      grid.innerHTML = Object.values(Profile.ACHIEVEMENTS).map(a => {
+        const got = unlocked.includes(a.id);
+        return `
+          <div class="badge-card ${got ? 'unlocked' : 'locked'}">
+            <div class="badge-icon">${got ? a.icon : '🔒'}</div>
+            <div class="badge-name">${a.name}</div>
+            <div class="badge-desc">${a.desc}</div>
+            ${got ? '<div class="badge-check">✓ Получено</div>' : ''}
+          </div>`;
+      }).join('');
+    }
+
+    // ── Редактирование ──────────────────────────
+    function openEditModal() {
+      const p = Profile.getProfile();
+      document.getElementById('edit-name-input').value = p?.username || '';
+      _selectedAvatar = p?.avatar || '🐍';
+
+      const grid = document.getElementById('edit-avatar-grid');
+      grid.innerHTML = AVATARS.map(a => `
+        <button class="avatar-btn${a === _selectedAvatar ? ' selected' : ''}"
+                onclick="selectAvatar('${a}')">${a}</button>
+      `).join('');
+
+      document.getElementById('edit-modal').hidden = false;
+    }
+
+    window.selectAvatar = function(emoji) {
+      _selectedAvatar = emoji;
+      document.querySelectorAll('#edit-avatar-grid .avatar-btn').forEach(b =>
+        b.classList.toggle('selected', b.dataset?.avatar === emoji || b.textContent === emoji)
+      );
+    };
+
+    document.getElementById('edit-btn').onclick = openEditModal;
+
+    document.getElementById('save-edit-btn').onclick = () => {
+      const name = document.getElementById('edit-name-input').value.trim();
+      if (!name) return;
+      Profile.updateProfile(name, _selectedAvatar);
+      document.getElementById('edit-modal').hidden = true;
+      render();
+    };
+
+    // ── Закрытие модала по клику на фон ─────────
+    document.getElementById('edit-modal').addEventListener('click', e => {
+      if (e.target === e.currentTarget) e.currentTarget.hidden = true;
+    });
+
+    // Запуск
+    render();
+  </script>
+</body>
+</html>

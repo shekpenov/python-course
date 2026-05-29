@@ -70,7 +70,7 @@ print("Итог:", arr)`
 `,
         solution: `arr = [9, 3, 7, 1, 5]\nn = len(arr)\nfor i in range(n-1):\n    for j in range(n-1-i):\n        if arr[j] > arr[j+1]:\n            arr[j], arr[j+1] = arr[j+1], arr[j]\nprint(arr)`,
         hint: 'Двойной цикл: внешний — количество проходов, внутренний — сравнение соседей. Обмен: <code>arr[j], arr[j+1] = arr[j+1], arr[j]</code>.',
-        test: (out, code) => out.trim() === '[1, 3, 5, 7, 9]' && code.includes('def') || out.trim() === '[1, 3, 5, 7, 9]'
+        test: (out, code) => out.trim() === '[1, 3, 5, 7, 9]' && code.includes('for')
       }
     },
 

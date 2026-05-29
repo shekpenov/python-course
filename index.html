@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/profile.css">
   <title>Python Учебник</title>
 </head>
 <body>
@@ -38,6 +39,18 @@
         </svg>
         <span>Python Курс</span>
       </div>
+
+      <!-- Мини-карточка профиля -->
+      <a href="profile.html" id="mini-profile-card" title="Открыть профиль">
+        <div id="mini-avatar">🐍</div>
+        <div id="mini-info">
+          <div id="mini-username">Ученик</div>
+          <div id="mini-level-text">Ур.1 · Новичок</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <div id="mini-xp-strip"><div id="mini-xp-fill"></div></div>
+      <span id="mini-xp-label">0 / 100 XP</span>
 
       <div id="level-summary">
         <div id="level-header">
@@ -110,6 +123,40 @@
       <p id="pyodide-status">Загрузка Python...</p>
       <small id="pyodide-hint">Первый запуск может занять ~15 секунд</small>
       <button id="pyodide-close" class="loading-close" onclick="document.getElementById('pyodide-loading').hidden=true" hidden>✕ Закрыть</button>
+    </div>
+  </div>
+
+  <!-- ── Модал создания профиля (первый запуск) ── -->
+  <div id="profile-setup-modal" hidden>
+    <div class="setup-card">
+      <div class="setup-emoji">🐍</div>
+      <h2>Добро пожаловать!</h2>
+      <p>Введите имя и выберите аватар, чтобы начать курс</p>
+      <label class="setup-name-label">Ваше имя</label>
+      <input type="text" id="setup-name-input" maxlength="30" placeholder="Например: Алия" autocomplete="off">
+      <label class="setup-avatar-label">Выберите аватар</label>
+      <div class="avatar-grid" id="setup-avatar-grid"></div>
+      <button class="setup-submit" onclick="Profile.saveSetup()">Начать курс 🚀</button>
+    </div>
+  </div>
+
+  <!-- ── Toast уведомление о достижении ── -->
+  <div id="achievement-toast">
+    <div class="toast-icon">🏅</div>
+    <div class="toast-body">
+      <div class="toast-title">Новое достижение!</div>
+      <div class="toast-name"></div>
+      <div class="toast-desc"></div>
+    </div>
+  </div>
+
+  <!-- ── Анимация повышения уровня ── -->
+  <div id="levelup-overlay" hidden>
+    <div class="levelup-card">
+      <div class="levelup-emoji">🎉</div>
+      <div class="levelup-title">Уровень повышен!</div>
+      <div class="levelup-new">Уровень 2: Ученик</div>
+      <button class="levelup-btn" onclick="Profile.hideLevelUp()">Продолжить →</button>
     </div>
   </div>
 

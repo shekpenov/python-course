@@ -115,12 +115,12 @@ else:
       task: {
         xp: 25,
         practice: true,
-        prompt: 'Дано <code>ball = 82</code>, <code>poseshaemost = 85</code> (%). Если посещаемость >= 75%: вычисли оценку (90+ Отлично, 70+ Хорошо, иначе Удовл.). Если посещаемость < 75: вывести <em>«Снижено: Хорошо»</em> при ball >= 80, иначе <em>«Снижено: Удовл.»</em>. Первое слово вывода должно быть <em>«Итого:»</em>.',
+        prompt: 'Дано <code>ball = 82</code>, <code>poseshaemost = 85</code> (%). Если посещаемость >= 75%: выведи оценку — 90+ → <em>«Отлично»</em>, 70+ → <em>«Хорошо»</em>, иначе → <em>«Удовл.»</em>. Если посещаемость < 75: выведи <em>«Хорошо (снижено)»</em> при ball >= 80, иначе <em>«Удовл. (снижено)»</em>. Ожидаемый вывод: <em>«Хорошо»</em>.',
         starterCode: `# ваш код здесь
 `,
-        solution: `ball = 82\nposeshaemost = 85\nif poseshaemost >= 75:\n    if ball >= 90:\n        print("Итого: Отлично")\n    elif ball >= 70:\n        print("Итого: Хорошо")\n    else:\n        print("Итого: Удовл.")\nelse:\n    if ball >= 80:\n        print("Итого: Снижено: Хорошо")\n    else:\n        print("Итого: Снижено: Удовл.")`,
-        hint: 'Внешнее условие — посещаемость. Внутри каждой ветки — условие на балл.',
-        test: (out, code) => out.trim().startsWith('Итого:') && out.includes('Хорошо') && code.includes('if')
+        solution: `ball = 82\nposeshaemost = 85\nif poseshaemost >= 75:\n    if ball >= 90:\n        print("Отлично")\n    elif ball >= 70:\n        print("Хорошо")\n    else:\n        print("Удовл.")\nelse:\n    if ball >= 80:\n        print("Хорошо (снижено)")\n    else:\n        print("Удовл. (снижено)")`,
+        hint: 'Внешний if — посещаемость. Внутри каждой ветки — условие на балл. Всего 2 уровня вложенности.',
+        test: (out, code) => out.trim() === 'Хорошо' && code.includes('if')
       }
     }
   ]

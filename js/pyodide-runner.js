@@ -53,17 +53,22 @@ const DATA_FILES = [
   '/data/words.txt',
 ];
 
+// Содержимое файлов — резервная копия на случай если fetch не сработает
+const DATA_FALLBACK = {
+  '/data/numbers.txt':  '10\n20\n30\n40\n50\n',
+  '/data/students.txt': 'Алия,95\nБерик,78\nДаниар,62\nАйгерим,88\nНурлан,71\n',
+  '/data/words.txt':    'python прост и элегантен\npython мощный и универсальный\npython используется в науке и бизнесе\nизучай python каждый день\nпрограммирование это творчество\n',
+};
+
 async function loadDataFiles(py) {
-  try {
-    py.FS.mkdir('/data');
-  } catch {}
+  try { py.FS.mkdir('/data'); } catch {}
   for (const path of DATA_FILES) {
+    let text = DATA_FALLBACK[path] || '';
     try {
       const res = await fetch(path);
-      if (!res.ok) continue;
-      const text = await res.text();
-      py.FS.writeFile(path, text, { encoding: 'utf8' });
+      if (res.ok) text = await res.text();
     } catch {}
+    try { py.FS.writeFile(path, text, { encoding: 'utf8' }); } catch {}
   }
 }
 
