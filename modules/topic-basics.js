@@ -111,7 +111,7 @@ print(f"2 ** 10 = {2 ** 10}")`
 `,
         solution: `a = 8\nb = 5\nprint(f"Площадь: {a * b}")`,
         hint: 'Площадь прямоугольника = длина × ширина. Используйте <code>a * b</code> внутри f-строки.',
-        test: (out, code) => out.trim() === 'Площадь: 40' && (code.includes('*') || code.includes('40'))
+        test: (out, code) => out.trim() === 'Площадь: 40' && code.includes('*')
       }
     },
 

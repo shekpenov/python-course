@@ -94,7 +94,7 @@ print(f"Символов (без пробелов): {kol_simvolov}")`
 `,
       solution: `with open('/tmp/numbers.txt', 'w') as f:\n    for i in range(1, 6):\n        f.write(str(i) + '\\n')\nsumma = 0\nwith open('/tmp/numbers.txt', 'r') as f:\n    for line in f:\n        summa += int(line.strip())\nprint(summa)`,
       hint: 'При чтении каждая строка файла содержит символ новой строки <code>\\n</code> в конце. Метод <code>.strip()</code> убирает его. После этого преобразуйте строку в число: <code>int(line.strip())</code>.',
-      test: (out, code) => out.trim() === '15'
+      test: (out, code) => out.trim() === '15' && code.includes('open(')
     },
     {
       prompt: 'Запишите три строки в файл <code>/tmp/poem.txt</code> с помощью <code>writelines()</code>. Прочитайте файл и выведите количество строк. Ожидаемый ответ: <em>3</em>.',
@@ -102,7 +102,7 @@ print(f"Символов (без пробелов): {kol_simvolov}")`
 `,
       solution: `stroki = ["Первая строка\\n", "Вторая строка\\n", "Третья строка\\n"]\nwith open('/tmp/poem.txt', 'w', encoding='utf-8') as f:\n    f.writelines(stroki)\nwith open('/tmp/poem.txt', 'r', encoding='utf-8') as f:\n    lines = f.readlines()\nprint(len(lines))`,
       hint: '<code>readlines()</code> возвращает список строк — каждая строка файла становится отдельным элементом. Чтобы узнать количество строк, достаточно применить <code>len()</code> к этому списку.',
-      test: (out, code) => out.trim() === '3'
+      test: (out, code) => out.trim() === '3' && code.includes('open(')
     },
     {
       prompt: 'Создайте файл <code>/tmp/search.txt</code> со словами: <em>яблоко, банан, апельсин, яблоко, груша</em> (каждое на отдельной строке). Найдите и выведите количество вхождений слова <em>«яблоко»</em>. Ожидаемый ответ: <em>2</em>.',
@@ -110,7 +110,7 @@ print(f"Символов (без пробелов): {kol_simvolov}")`
 `,
       solution: `with open('/tmp/search.txt', 'w', encoding='utf-8') as f:\n    f.write("яблоко\\nбанан\\nапельсин\\nяблоко\\nгруша\\n")\ncount = 0\nwith open('/tmp/search.txt', 'r', encoding='utf-8') as f:\n    for line in f:\n        if line.strip() == "яблоко":\n            count += 1\nprint(count)`,
       hint: 'Обязательно используйте <code>.strip()</code> при чтении строки из файла — он убирает символ <code>\\n</code> в конце, иначе сравнение <code>== "яблоко"</code> никогда не будет истинным.',
-      test: (out, code) => out.trim() === '2'
+      test: (out, code) => out.trim() === '2' && code.includes('open(')
     }
   ]
 };

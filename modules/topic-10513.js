@@ -102,31 +102,31 @@ print(f"\\nСредний балл: {total/count:.1f}")`
 
   tasks: [
     {
-      prompt: 'Запишите список слов <code>["яблоко", "банан", "вишня", "груша", "дыня"]</code> в файл <code>/tmp/fruits.txt</code> (каждое на отдельной строке). Прочитайте файл и выведите количество слов, содержащих букву <em>«а»</em>. Ожидаемый ответ: <em>3</em> (яблоко — нет, банан — да, вишня — нет, груша — нет, дыня — да, а также яблоко не содержит «а»... проверьте: яблоко(нет), банан(да), вишня(нет), груша(да), дыня(да) = 3).',
+      prompt: 'Запишите список слов <code>["яблоко", "банан", "вишня", "груша", "дыня"]</code> в файл <code>/tmp/fruits.txt</code> (каждое на отдельной строке). Прочитайте файл и выведите количество слов, содержащих букву <em>«а»</em>. Ожидаемый ответ: <em>2</em> — только банан и груша содержат «а» (буква «я» ≠ «а»!).',
       starterCode: `# ваш код здесь
 `,
-      solution: `...`,
-      hint: 'При проверке слова на содержание буквы используйте оператор <code>in</code>: <code>if "а" in word</code>. Не забудьте <code>.strip()</code> для очистки строки от символа переноса. Разберитесь, какие из слов содержат «а»: банан, груша, дыня.',
-      test: (out, code) => out.trim() === '3'
+      solution: `fruits = ["яблоко", "банан", "вишня", "груша", "дыня"]\nwith open('/tmp/fruits.txt', 'w', encoding='utf-8') as f:\n    for fruit in fruits:\n        f.write(fruit + '\\n')\ncount = 0\nwith open('/tmp/fruits.txt', 'r', encoding='utf-8') as f:\n    for line in f:\n        if 'а' in line.strip():\n            count += 1\nprint(count)`,
+      hint: 'Используйте <code>if "а" in word</code> — именно буква «а», не «я». Проверьте вручную: яблоко(нет), банан(да), вишня(нет), груша(да), дыня(нет) → итого 2.',
+      test: (out, code) => out.trim() === '2' && code.includes('open(')
     },
     {
       prompt: 'Создайте файл <code>/tmp/data.txt</code> с числами: 10, 20, 30, 40, 50 (каждое на новой строке). Прочитайте файл, умножьте каждое число на 2 и запишите результаты в файл <code>/tmp/result.txt</code>. Выведите содержимое result.txt. Первая строка должна быть <em>20</em>.',
       starterCode: `# ваш код здесь
 `,
-      solution: `...`,
-      hint: 'Открывайте сразу два файла в одном блоке <code>with</code>: один для чтения (<code>fin</code>), другой для записи (<code>fout</code>). При записи результата преобразуйте число обратно в строку через <code>str()</code> и добавьте <code>\\n</code>.',
+      solution: `with open('/tmp/data.txt', 'w') as f:\n    for n in [10, 20, 30, 40, 50]:\n        f.write(str(n) + '\\n')\nwith open('/tmp/data.txt', 'r') as fin:\n    with open('/tmp/result.txt', 'w') as fout:\n        for line in fin:\n            fout.write(str(int(line.strip()) * 2) + '\\n')\nwith open('/tmp/result.txt', 'r') as f:\n    print(f.read().strip())`,
+      hint: 'Откройте файл для чтения (<code>fin</code>) и одновременно второй файл для записи (<code>fout</code>). Для каждой строки: прочитайте число через <code>int(line.strip())</code>, умножьте на 2, запишите обратно как строку с <code>\\n</code>.',
       test: (out, code) => {
         const lines = out.trim().split('\n').map(l => l.trim());
-        return lines[0] === '20' && lines.length === 5 && lines[4] === '100';
+        return lines[0] === '20' && lines.length === 5 && lines[4] === '100' && code.includes('open(');
       }
     },
     {
       prompt: 'Используя модуль <code>csv</code>, запишите таблицу успеваемости (3 студента: Алия 95, Берик 78, Данияр 62) в файл <code>/tmp/marks.csv</code>. Прочитайте файл и выведите имя студента с наибольшим баллом. Ожидаемый ответ: <em>Алия</em>.',
       starterCode: `# ваш код здесь
 `,
-      solution: `...`,
-      hint: 'При чтении CSV каждая строка — это список строк: <code>row[0]</code> — имя, <code>row[1]</code> — балл в виде текста. Преобразуйте балл в число через <code>int(row[1])</code>. <code>next(reader)</code> пропускает заголовок — не удаляйте эту строку.',
-      test: (out, code) => out.trim() === 'Алия'
+      solution: `import csv\nstudents = [['Алия', 95], ['Берик', 78], ['Данияр', 62]]\nwith open('/tmp/marks.csv', 'w', newline='', encoding='utf-8') as f:\n    writer = csv.writer(f)\n    writer.writerow(['Имя', 'Балл'])\n    writer.writerows(students)\nbest_name = ''\nbest_score = 0\nwith open('/tmp/marks.csv', 'r', encoding='utf-8') as f:\n    reader = csv.reader(f)\n    next(reader)\n    for row in reader:\n        name, score = row[0], int(row[1])\n        if score > best_score:\n            best_score = score\n            best_name = name\nprint(best_name)`,
+      hint: 'Используйте <code>import csv</code>. При чтении: <code>row[0]</code> — имя, <code>int(row[1])</code> — балл. Сравнивайте баллы, сохраняя имя с максимальным. <code>next(reader)</code> пропускает строку-заголовок.',
+      test: (out, code) => out.trim() === 'Алия' && code.includes('csv') && code.includes('open(')
     }
   ]
 };

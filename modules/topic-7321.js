@@ -77,7 +77,7 @@ print(f"Ваш балл: {ocenka}")`
 `,
       solution: `a = 8\nb = 3\nc = 11\nif a >= b and a >= c:\n    print(a)\nelif b >= a and b >= c:\n    print(b)\nelse:\n    print(c)`,
       hint: 'Для проверки «a наибольшее» нужно убедиться, что <code>a >= b</code> И <code>a >= c</code> одновременно — используйте <code>and</code>. Проверьте каждую переменную через отдельную ветку <code>if / elif / else</code>.',
-      test: (out, code) => out.trim() === '11' && code.includes('if')
+      test: (out, code) => out.trim() === '11' && (code.includes('if') || code.includes('max('))
     },
     {
       prompt: 'Дана температура воздуха <code>temp = 18</code> (в °C). Выведите рекомендацию: если меньше 0 — <em>«Наденьте шубу»</em>, если 0–14 — <em>«Возьмите куртку»</em>, если 15–24 — <em>«Лёгкая одежда»</em>, если 25 и выше — <em>«Жарко!»</em>.',

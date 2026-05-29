@@ -106,7 +106,7 @@ for parts in names:
 `,
       solution: `def count_char(s, ch):\n    return s.lower().count(ch.lower())\nresult = count_char("Программирование", "а")\nprint(result)`,
       hint: 'Чтобы поиск не зависел от регистра, приведите обе строки к нижнему регистру через <code>.lower()</code>, затем используйте метод <code>.count()</code>. Код готов — разберитесь, почему вызываются два <code>.lower()</code>.',
-      test: (out, code) => out.trim() === '2' && code.includes('def')
+      test: (out, code) => out.trim() === '2' && code.includes('def count_char') && code.includes('count_char(')
     },
     {
       prompt: 'Напишите функцию <code>to_title_case(s)</code>, которая переводит строку в «заглавный регистр» (первая буква каждого слова заглавная). Проверьте на строке <code>"изучаем python в школе"</code>. Ожидаемый вывод: <em>Изучаем Python В Школе</em>.',
@@ -114,7 +114,7 @@ for parts in names:
 `,
       solution: `def to_title_case(s):\n    return s.title()\nresult = to_title_case("изучаем python в школе")\nprint(result)`,
       hint: 'У строк есть встроенный метод <code>.title()</code>, который делает именно это — первую букву каждого слова заглавной. Функция уже написана — попробуйте запустить и убедиться в результате.',
-      test: (out, code) => out.trim() === 'Изучаем Python В Школе' && code.includes('def')
+      test: (out, code) => out.trim() === 'Изучаем Python В Школе' && code.includes('def to_title_case') && code.includes('to_title_case(')
     },
     {
       prompt: 'Напишите функцию <code>is_valid_password(pwd)</code>, которая проверяет пароль: длина не менее 8 символов И содержит хотя бы одну цифру. Проверьте <code>"Python42"</code>. Ожидаемый ответ: <em>True</em>.',
@@ -122,7 +122,7 @@ for parts in names:
 `,
       solution: `def is_valid_password(pwd):\n    has_digit = any(ch.isdigit() for ch in pwd)\n    long_enough = len(pwd) >= 8\n    return has_digit and long_enough\nresult = is_valid_password("Python42")\nprint(result)`,
       hint: '<code>any(...)</code> возвращает <code>True</code>, если хоть один элемент последовательности истинен. <code>ch.isdigit()</code> проверяет, является ли символ цифрой. Оба условия соединяются через <code>and</code>. Код готов — запустите.',
-      test: (out, code) => out.trim() === 'True' && code.includes('def')
+      test: (out, code) => out.trim() === 'True' && code.includes('def is_valid_password') && code.includes('is_valid_password(')
     }
   ]
 };

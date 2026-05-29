@@ -71,7 +71,7 @@ print(f"Среднее: {summa / len(chisla):.2f}")`
 `,
       solution: `summa = 0\nfor i in range(1, 51):\n    summa += i\nprint(summa)`,
       hint: 'Замените <code>pass</code> на <code>summa += i</code>. Убедитесь, что в <code>range()</code> указаны правильные границы — второй аргумент не включается.',
-      test: (out, code) => out.trim() === '1275' && code.includes('for')
+      test: (out, code) => out.trim() === '1275' && (code.includes('for') || code.includes('sum('))
     },
     {
       prompt: 'Дан список <code>numbers = [4, 17, 2, 9, 31, 6, 14]</code>. Найдите и выведите количество чётных чисел в этом списке. Правильный ответ: <em>3</em>.',
