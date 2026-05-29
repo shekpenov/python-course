@@ -68,12 +68,19 @@ async function initPyodide() {
     ]);
 
     pyodide.runPython(`
-import sys, io
+import sys, io, builtins
 class _Capture:
     def __init__(self): self._p = []
     def write(self, s): self._p.append(str(s))
     def flush(self): pass
     def getvalue(self): return ''.join(self._p)
+def input(prompt=""):
+    import js
+    result = js.prompt(str(prompt) if prompt else "")
+    if result is None:
+        return ""
+    return str(result)
+builtins.input = input
 `);
 
     waiters.forEach(([r]) => r(pyodide));
