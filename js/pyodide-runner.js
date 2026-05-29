@@ -47,6 +47,26 @@ async function loadScript(src) {
   });
 }
 
+const DATA_FILES = [
+  '/data/numbers.txt',
+  '/data/students.txt',
+  '/data/words.txt',
+];
+
+async function loadDataFiles(py) {
+  try {
+    py.FS.mkdir('/data');
+  } catch {}
+  for (const path of DATA_FILES) {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) continue;
+      const text = await res.text();
+      py.FS.writeFile(path, text, { encoding: 'utf8' });
+    } catch {}
+  }
+}
+
 async function initPyodide() {
   if (pyodide) return pyodide;
   if (loading) return new Promise((r, e) => waiters.push([r, e]));
@@ -82,6 +102,8 @@ def input(prompt=""):
     return str(result)
 builtins.input = input
 `);
+
+    await loadDataFiles(pyodide);
 
     waiters.forEach(([r]) => r(pyodide));
     hideOverlay();
