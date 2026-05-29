@@ -1,4 +1,5 @@
-import { getTopicProgress, setTaskPassed, isTaskPassed, getCompletedCount } from './progress.js';
+import { getTopicProgress, setTaskPassed, isTaskPassed, getCompletedCount,
+         getTotalXP, addXP, getLevelInfo, isTopicUnlocked, LEVELS } from './progress.js';
 import { runPython } from './pyodide-runner.js';
 
 const TOPICS = [
@@ -65,9 +66,10 @@ function buildSidebar() {
 function buildNavItem(topic) {
   const p = getTopicProgress(topic.id);
   const done = p.completed;
+  const locked = !isTopicUnlocked(topic.id);
   return `
-    <div class="nav-item${done ? ' completed' : ''}" data-topic="${topic.id}" role="button">
-      <span class="nav-item-check">${done ? '✓' : '○'}</span>
+    <div class="nav-item${done ? ' completed' : ''}${locked ? ' locked' : ''}" data-topic="${topic.id}" role="button">
+      <span class="nav-item-check">${locked ? '🔒' : done ? '✓' : '○'}</span>
       <div class="nav-item-info">
         <div class="nav-item-code">${topic.code}</div>
         <div class="nav-item-title">${topic.title}</div>
@@ -77,17 +79,42 @@ function buildNavItem(topic) {
 
 function refreshNav() {
   document.querySelectorAll('.nav-item').forEach(el => {
-    const p = getTopicProgress(el.dataset.topic);
+    const id = el.dataset.topic;
+    const p = getTopicProgress(id);
+    const locked = !isTopicUnlocked(id);
     el.classList.toggle('completed', p.completed);
-    el.querySelector('.nav-item-check').textContent = p.completed ? '✓' : '○';
+    el.classList.toggle('locked', locked);
+    el.querySelector('.nav-item-check').textContent = locked ? '🔒' : p.completed ? '✓' : '○';
   });
 }
 
-// ──────────────────────── PROGRESS ────────────────────────
+// ──────────────────────── PROGRESS / XP ────────────────────────
 function updateProgressUI() {
   const n = getCompletedCount(ALL_IDS);
   document.getElementById('progress-bar').style.width = (n / ALL_IDS.length * 100) + '%';
   document.getElementById('progress-text').textContent = `${n} / ${ALL_IDS.length} тем завершено`;
+  updateXPUI();
+}
+
+function updateXPUI() {
+  const { current, next, xp, pct } = getLevelInfo();
+  const badge = document.getElementById('level-badge');
+  const nameEl = document.getElementById('level-name');
+  const xpFill = document.getElementById('xp-bar-fill');
+  const xpText = document.getElementById('xp-text');
+  if (badge) badge.textContent = `Ур. ${current.level}`;
+  if (nameEl) nameEl.textContent = current.name;
+  if (xpFill) xpFill.style.width = pct + '%';
+  if (xpText) xpText.textContent = next ? `${xp - current.xp} / ${next.xp - current.xp} XP` : 'MAX';
+}
+
+function showXPPopup(amount, levelUp, levelName) {
+  const el = document.createElement('div');
+  el.className = 'xp-popup' + (levelUp ? ' levelup' : '');
+  el.textContent = levelUp ? `🎉 Уровень повышен! ${levelName}` : `+${amount} XP`;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add('visible'), 10);
+  setTimeout(() => { el.classList.remove('visible'); setTimeout(() => el.remove(), 400); }, 2000);
 }
 
 // ──────────────────────── ROUTER ────────────────────────
@@ -108,6 +135,18 @@ function showHome() {
 async function loadTopic(topicId) {
   const meta = TOPICS.find(t => t.id === topicId);
   if (!meta) return;
+  if (!isTopicUnlocked(topicId)) {
+    const { current, next } = getLevelInfo();
+    document.getElementById('home-view').hidden = false;
+    document.getElementById('topic-view').hidden = true;
+    document.getElementById('home-view').querySelector('.welcome-card').innerHTML = `
+      <div class="welcome-icon">🔒</div>
+      <h1>Тема заблокирована</h1>
+      <p>Для открытия «${meta.title}» нужен уровень <strong>${next ? next.level : '?'}: ${next ? next.name : ''}</strong>.<br>
+      Сейчас у тебя уровень ${current.level} (${current.name}) — ${getTotalXP()} XP.<br>
+      Завершай задачи в открытых темах чтобы набрать опыт!</p>`;
+    return;
+  }
 
   document.querySelectorAll('.nav-item').forEach(el =>
     el.classList.toggle('active', el.dataset.topic === topicId));
@@ -212,9 +251,16 @@ async function runExample(i, examples) {
 function renderSinglePage(topic) {
   const container = document.getElementById('theory-content');
 
+  const allLearnDone = topic.sections.every((sec, i) => {
+    if (!sec.task || sec.task.practice) return true;
+    return isTaskPassed(topic.id, i);
+  });
+
   container.innerHTML = `<div class="practice-warning">⚠️ Вывод программы должен <strong>точно совпадать</strong> с ожидаемым ответом — проверяйте регистр букв, пробелы и знаки препинания.</div>` +
   topic.sections.map((sec, si) => {
     const done = isTaskPassed(topic.id, si);
+    const isPractice = sec.task?.practice;
+    const lockPractice = isPractice && !allLearnDone && !done;
     return `
       <div class="sp-section" id="sp-sec-${si}">
         <h2 class="sp-heading">${sec.heading}</h2>
@@ -228,9 +274,16 @@ function renderSinglePage(topic) {
             <div class="sp-example-out" id="sp-out-${si}"><pre id="sp-out-text-${si}"></pre></div>
           </div>
         </div>` : ''}
+        ${sec.task && lockPractice ? `
+        <div class="sp-practice-lock" id="sp-lock-${si}">
+          <span>🔒</span>
+          <p>Выполните все обучающие задания выше, чтобы открыть практику</p>
+        </div>
+        <div class="sp-task${done ? ' task-done' : ''}" id="sp-task-${si}" hidden>` : ''}
+        ${sec.task && !lockPractice ? `
+        <div class="sp-task${done ? ' task-done' : ''}" id="sp-task-${si}">` : ''}
         ${sec.task ? `
-        <div class="sp-task${done ? ' task-done' : ''}" id="sp-task-${si}">
-          <div class="sp-task-label">✏️ Практика</div>
+          <div class="sp-task-label">${sec.task.practice ? '🏆 Практика' : '✏️ Задание'}<span class="xp-badge">+${sec.task.xp || (sec.task.practice ? 20 : 10)} XP</span></div>
           <div class="sp-task-prompt">${sec.task.prompt}</div>
           <textarea class="code-editor" id="sp-editor-${si}" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off">${esc(sec.task.starterCode)}</textarea>
           <div class="task-actions">
@@ -326,11 +379,31 @@ async function checkSpTask(si) {
     document.getElementById(`sp-dot-label-${si}`).textContent = 'Выполнено ✓';
     document.getElementById(`sp-task-${si}`).classList.add('task-done');
     setTaskPassed(currentTopic.id, si, currentTopic.sections.length);
+    const xpAmount = task.xp || (task.practice ? 20 : 10);
+    const { levelUp, newLevel } = addXP(xpAmount);
     updateProgressUI();
     refreshNav();
     const solEl = document.getElementById(`sp-solution-${si}`);
     if (solEl) { solEl.hidden = false; if (window.Prism) Prism.highlightAllUnder(solEl); }
+    showXPPopup(xpAmount, levelUp, levelUp ? LEVELS.find(l => l.level === newLevel)?.name : '');
+    checkPracticeUnlock();
   }
+}
+
+function checkPracticeUnlock() {
+  if (!currentTopic?.sections) return;
+  const allLearnDone = currentTopic.sections.every((sec, i) => {
+    if (!sec.task || sec.task.practice) return true;
+    return isTaskPassed(currentTopic.id, i);
+  });
+  if (!allLearnDone) return;
+  currentTopic.sections.forEach((sec, si) => {
+    if (!sec.task?.practice) return;
+    const lockEl = document.getElementById(`sp-lock-${si}`);
+    const taskEl = document.getElementById(`sp-task-${si}`);
+    if (lockEl) lockEl.remove();
+    if (taskEl) taskEl.hidden = false;
+  });
 }
 
 function showSpOutput(si, output, error) {
@@ -438,9 +511,12 @@ async function execTaskCheck(i) {
     document.getElementById(`dot-label-${i}`).textContent = 'Выполнено ✓';
     document.getElementById(`task-${i}`).classList.add('task-done');
     setTaskPassed(currentTopic.id, i, currentTopic.tasks.length);
+    const xpAmount = task.xp || 15;
+    const { levelUp, newLevel } = addXP(xpAmount);
     updateProgressUI();
     refreshNav();
     showSolution(i);
+    showXPPopup(xpAmount, levelUp, levelUp ? LEVELS.find(l => l.level === newLevel)?.name : '');
   }
 }
 

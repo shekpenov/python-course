@@ -2,127 +2,132 @@ export default {
   id: 'topic-10512',
   code: '10.5.1.2',
   title: 'Обработка строк с помощью функций',
+  layout: 'single',
 
-  theory: `
-<h2>Строки в Python</h2>
-<p>Строка (<code>str</code>) — неизменяемая последовательность символов. Доступ к символам — через индекс (<code>s[0]</code>), к подстроке — через срез (<code>s[1:4]</code>). Строки поддерживают множество встроенных методов для обработки текста.</p>
-
-<h2>Основные методы строк</h2>
+  sections: [
+    {
+      heading: 'Основные методы строк',
+      content: `
+<p>Строка — неизменяемая последовательность символов. Методы возвращают <em>новую</em> строку — не меняют исходную:</p>
 <pre><code class="language-python">s = "  Привет, Мир!  "
+s.upper()            # "  ПРИВЕТ, МИР!  "
+s.lower()            # "  привет, мир!  "
+s.strip()            # "Привет, Мир!" (убрать пробелы)
+s.replace("Мир", "Python")  # замена
+s.count("и")         # число вхождений
+s.find("Мир")        # индекс первого вхождения (-1 если нет)
+s.split(",")         # список по разделителю
+" ".join(["a","b"])  # объединить список → "a b"</code></pre>`,
+      example: {
+        title: 'Обработка имени',
+        code: `name = "  алия ахметова  "
+name = name.strip().title()
+print(name)          # "Алия Ахметова"
+print(len(name))     # длина
+words = name.split()
+print(words)         # ['Алия', 'Ахметова']
+print(words[0])      # первое слово`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Напишите функцию <code>count_char(s, ch)</code>, которая считает вхождения символа <code>ch</code> без учёта регистра. Проверьте <code>count_char("Программирование", "а")</code>. Ожидаемый ответ: <em>2</em>.',
+        starterCode: `# ваш код здесь
+`,
+        solution: `def count_char(s, ch):\n    return s.lower().count(ch.lower())\nprint(count_char("Программирование", "а"))`,
+        hint: 'Приведи обе строки к нижнему регистру через <code>.lower()</code>, потом используй <code>.count()</code>.',
+        test: (out, code) => out.trim() === '2' && code.includes('def count_char') && code.includes('count_char(')
+      }
+    },
 
-s.upper()          # "  ПРИВЕТ, МИР!  "
-s.lower()          # "  привет, мир!  "
-s.strip()          # "Привет, Мир!" — убирает пробелы
-s.strip().title()  # "Привет, Мир!"
+    {
+      heading: 'Срезы строк',
+      content: `
+<pre><code class="language-python">s = "Python"
+s[0]     # 'P'  — первый
+s[-1]    # 'n'  — последний
+s[1:4]   # 'yth' — символы с 1 по 3
+s[:3]    # 'Pyt' — первые 3
+s[3:]    # 'hon' — с 3 до конца
+s[::-1]  # 'nohtyP' — обратная строка
+s[::2]   # 'Pto' — каждый второй</code></pre>`,
+      example: {
+        title: 'Работа со срезами',
+        code: `s = "Hello, World!"
+print(s[7:12])     # World
+print(s[::-1])     # !dlroW ,olleH
+print(s[0].upper() + s[1:])  # строка с заглавной первой буквой`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Напишите функцию <code>to_title_case(s)</code>, которая делает первую букву каждого слова заглавной. Проверьте на <code>"изучаем python в школе"</code>. Ожидаемый вывод: <em>Изучаем Python В Школе</em>.',
+        starterCode: `# ваш код здесь
+`,
+        solution: `def to_title_case(s):\n    return s.title()\nprint(to_title_case("изучаем python в школе"))`,
+        hint: 'Метод <code>.title()</code> делает первую букву каждого слова заглавной.',
+        test: (out, code) => out.trim() === 'Изучаем Python В Школе' && code.includes('def to_title_case') && code.includes('to_title_case(')
+      }
+    },
 
-s.replace("Мир", "Python")   # замена
-s.count("и")                 # число вхождений
-s.find("Мир")                # индекс первого вхождения (-1 если нет)
-s.startswith("  Привет")     # True
-s.endswith("!  ")            # True
-s.split(",")                 # ["  Привет", " Мир!  "]
-",".join(["a", "b", "c"])   # "a,b,c"</code></pre>
-
-<h2>Форматирование строк (f-строки)</h2>
+    {
+      heading: 'f-строки и форматирование',
+      content: `
 <pre><code class="language-python">name = "Алия"
 age = 16
-# f-строка (Python 3.6+)
 print(f"Имя: {name}, возраст: {age}")
-# Форматирование числа
+
 pi = 3.14159
-print(f"π ≈ {pi:.2f}")          # 3.14
-print(f"Число: {42:05d}")       # 00042</code></pre>
-
-<h2>Срезы строк</h2>
-<pre><code class="language-python">s = "Python"
-s[0]     # 'P'
-s[-1]    # 'n'
-s[1:4]   # 'yth'
-s[:3]    # 'Pyt'
-s[3:]    # 'hon'
-s[::-1]  # 'nohtyP' — обратная строка
-s[::2]   # 'Pto' — каждый второй символ</code></pre>
-
-<div class="tip"><strong>Совет:</strong> строки неизменяемы! Каждый метод возвращает <em>новую</em> строку, а не изменяет исходную. Присваивайте результат: <code>s = s.strip()</code>.</div>
+print(f"π ≈ {pi:.2f}")      # 3.14
+print(f"{42:05d}")           # 00042
+print(f"{'текст':>10}")      # выравнивание вправо
+print(f"{'текст':<10}|")     # выравнивание влево</code></pre>`,
+      example: {
+        title: 'Форматирование таблицы',
+        code: `students = [("Алия", 95), ("Берик", 78), ("Данияр", 62)]
+print(f"{'Имя':<12} {'Балл':>5} {'Оценка'}")
+print("-" * 30)
+for name, score in students:
+    grade = "A" if score >= 90 else "B" if score >= 75 else "C"
+    print(f"{name:<12} {score:>5} {grade}")`
+      },
+      task: {
+        xp: 15,
+        prompt: 'Напишите функцию <code>is_valid_password(pwd)</code>: длина >= 8 AND содержит хотя бы одну цифру. Проверьте <code>"Python42"</code>. Ожидаемый ответ: <em>True</em>.',
+        starterCode: `# ваш код здесь
 `,
-
-  examples: [
-    {
-      title: 'Пример 1: Анализ текста',
-      code: `def analyze_text(text):
-    """Анализирует строку и возвращает статистику."""
-    words = text.split()
-    chars_no_spaces = text.replace(" ", "")
-
-    vowels = "аеёиоуыэюяАЕЁИОУЫЭЮЯ"
-    vowel_count = sum(1 for c in text if c in vowels)
-
-    return {
-        'слов': len(words),
-        'символов': len(text),
-        'без_пробелов': len(chars_no_spaces),
-        'гласных': vowel_count
-    }
-
-sentence = "Изучайте Python каждый день"
-stats = analyze_text(sentence)
-print(f"Предложение: «{sentence}»")
-for key, val in stats.items():
-    print(f"  {key}: {val}")`
+        solution: `def is_valid_password(pwd):\n    return len(pwd) >= 8 and any(ch.isdigit() for ch in pwd)\nprint(is_valid_password("Python42"))`,
+        hint: '<code>any(ch.isdigit() for ch in pwd)</code> — True если есть хоть одна цифра. Объедини с <code>len(pwd) >= 8</code> через <code>and</code>.',
+        test: (out, code) => out.trim() === 'True' && code.includes('def is_valid_password') && code.includes('is_valid_password(')
+      }
     },
+
     {
-      title: 'Пример 2: Форматирование имени и генерация email',
-      code: `def format_name(last, first, middle=""):
-    """Возвращает полное имя в правильном регистре."""
-    parts = [last.strip().title()]
-    parts.append(first.strip().title())
-    if middle:
-        parts.append(middle.strip().title())
-    return " ".join(parts)
-
-def generate_login(last, first):
-    """Генерирует логин из имени."""
-    login = (first[0] + last).lower()
-    login = login.replace(" ", "")
-    return login
-
-names = [
-    ("ахметов", "берик", "нурланович"),
-    ("ИВАНОВА", "алия"),
-    ("петров", "данияр", "")
-]
-
-for parts in names:
-    full = format_name(*parts)
-    login = generate_login(parts[0], parts[1])
-    print(f"{full:<25} → логин: {login}")`
-    }
-  ],
-
-  tasks: [
-    {
-      prompt: 'Напишите функцию <code>count_char(s, ch)</code>, которая возвращает количество вхождений символа <code>ch</code> в строку <code>s</code> (без учёта регистра). Вызовите её: <code>count_char("Программирование", "а")</code>. Ожидаемый ответ: <em>2</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Практика: анализ текста',
+      content: `<p>Функция как инструмент анализа — подсчёт статистики строки.</p>`,
+      task: {
+        xp: 20,
+        practice: true,
+        prompt: 'Напишите функцию <code>word_count(text)</code>, которая возвращает количество слов в строке. Проверьте на <code>"Изучайте Python каждый день"</code>. Ожидаемый ответ: <em>4</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `def count_char(s, ch):\n    return s.lower().count(ch.lower())\nresult = count_char("Программирование", "а")\nprint(result)`,
-      hint: 'Чтобы поиск не зависел от регистра, приведите обе строки к нижнему регистру через <code>.lower()</code>, затем используйте метод <code>.count()</code>. Код готов — разберитесь, почему вызываются два <code>.lower()</code>.',
-      test: (out, code) => out.trim() === '2' && code.includes('def count_char') && code.includes('count_char(')
+        solution: `def word_count(text):\n    return len(text.split())\nprint(word_count("Изучайте Python каждый день"))`,
+        hint: '<code>text.split()</code> разбивает строку на слова по пробелам, возвращает список. <code>len()</code> — длина этого списка.',
+        test: (out, code) => out.trim() === '4' && code.includes('def word_count') && code.includes('word_count(')
+      }
     },
+
     {
-      prompt: 'Напишите функцию <code>to_title_case(s)</code>, которая переводит строку в «заглавный регистр» (первая буква каждого слова заглавная). Проверьте на строке <code>"изучаем python в школе"</code>. Ожидаемый вывод: <em>Изучаем Python В Школе</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Практика: палиндром и разворот',
+      content: `<p>Строковые операции в функциях — частая задача на экзаменах.</p>`,
+      task: {
+        xp: 25,
+        practice: true,
+        prompt: 'Напишите функцию <code>reverse_words(s)</code>, которая переворачивает порядок слов в строке. Проверьте на <code>"Python это здорово"</code>. Ожидаемый вывод: <em>здорово это Python</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `def to_title_case(s):\n    return s.title()\nresult = to_title_case("изучаем python в школе")\nprint(result)`,
-      hint: 'У строк есть встроенный метод <code>.title()</code>, который делает именно это — первую букву каждого слова заглавной. Функция уже написана — попробуйте запустить и убедиться в результате.',
-      test: (out, code) => out.trim() === 'Изучаем Python В Школе' && code.includes('def to_title_case') && code.includes('to_title_case(')
-    },
-    {
-      prompt: 'Напишите функцию <code>is_valid_password(pwd)</code>, которая проверяет пароль: длина не менее 8 символов И содержит хотя бы одну цифру. Проверьте <code>"Python42"</code>. Ожидаемый ответ: <em>True</em>.',
-      starterCode: `# ваш код здесь
-`,
-      solution: `def is_valid_password(pwd):\n    has_digit = any(ch.isdigit() for ch in pwd)\n    long_enough = len(pwd) >= 8\n    return has_digit and long_enough\nresult = is_valid_password("Python42")\nprint(result)`,
-      hint: '<code>any(...)</code> возвращает <code>True</code>, если хоть один элемент последовательности истинен. <code>ch.isdigit()</code> проверяет, является ли символ цифрой. Оба условия соединяются через <code>and</code>. Код готов — запустите.',
-      test: (out, code) => out.trim() === 'True' && code.includes('def is_valid_password') && code.includes('is_valid_password(')
+        solution: `def reverse_words(s):\n    return ' '.join(s.split()[::-1])\nprint(reverse_words("Python это здорово"))`,
+        hint: '<code>s.split()</code> → список слов. <code>[::-1]</code> → перевёрнутый список. <code>\' \'.join()</code> → обратно в строку.',
+        test: (out, code) => out.trim() === 'здорово это Python' && code.includes('def reverse_words') && code.includes('reverse_words(')
+      }
     }
   ]
 };

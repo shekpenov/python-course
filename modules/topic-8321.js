@@ -2,104 +2,122 @@ export default {
   id: 'topic-8321',
   code: '8.3.2.1',
   title: 'Трассировка алгоритмов',
+  layout: 'single',
 
-  theory: `
-<h2>Что такое трассировка?</h2>
-<p>Трассировка — это пошаговое выполнение алгоритма с отслеживанием значений всех переменных на каждом шаге. Трассировка позволяет понять, как работает алгоритм, найти ошибки в логике программы и убедиться в правильности решения.</p>
-<p>Результат трассировки обычно записывают в <strong>таблицу трассировки</strong>. Каждая строка таблицы соответствует одной итерации (шагу) алгоритма, а столбцы — значениям переменных на этом шаге.</p>
-
-<h2>Как составить таблицу трассировки</h2>
-<ol>
-  <li>Выпишите все переменные алгоритма.</li>
-  <li>Запишите их начальные значения.</li>
-  <li>Выполните каждую строку кода вручную.</li>
-  <li>После каждого шага записывайте новые значения переменных.</li>
-  <li>Отметьте условие: истинно или ложно.</li>
-</ol>
-
-<h2>Пример трассировки</h2>
-<pre><code class="language-python">i = 1
-s = 0
-while i <= 3:
-    s = s + i
-    i = i + 1
-print(s)</code></pre>
+  sections: [
+    {
+      heading: 'Что такое трассировка',
+      content: `
+<p>Трассировка — это пошаговое выполнение алгоритма с отслеживанием значений всех переменных. Это главный инструмент для понимания кода и поиска ошибок.</p>
+<p>Результат записывают в <strong>таблицу трассировки</strong>: каждая строка — одна итерация, столбцы — значения переменных.</p>
 <table>
   <tr><th>Шаг</th><th>i</th><th>s</th><th>i &lt;= 3?</th></tr>
   <tr><td>Начало</td><td>1</td><td>0</td><td>—</td></tr>
   <tr><td>1</td><td>2</td><td>1</td><td>True</td></tr>
   <tr><td>2</td><td>3</td><td>3</td><td>True</td></tr>
-  <tr><td>3</td><td>4</td><td>6</td><td>True</td></tr>
-  <tr><td>4</td><td>4</td><td>6</td><td>False → выход</td></tr>
-</table>
-
-<div class="tip"><strong>Совет:</strong> при трассировке полезно добавить в код временные <code>print()</code>-вызовы для вывода промежуточных значений переменных. Это называется «отладочный вывод» (debug print).</div>
-`,
-
-  examples: [
-    {
-      title: 'Пример 1: Трассировка с отладочным выводом',
-      code: `# Отслеживаем значения переменных в цикле
-i = 1
-proizvedenie = 1
-
-print(f"{'Шаг':<5} {'i':<5} {'произведение'}")
-print("-" * 30)
-
+  <tr><td>3</td><td>4</td><td>6</td><td>False → выход</td></tr>
+</table>`,
+      example: {
+        title: 'Трассировка с выводом шагов',
+        code: `i = 1
+s = 0
+print(f"{'Шаг':<4} {'i':<4} {'s'}")
 while i <= 5:
-    proizvedenie *= i
-    print(f"{i:<5} {i:<5} {proizvedenie}")
+    s += i
+    print(f"{i:<4} {i:<4} {s}")
     i += 1
-
-print(f"\\nРезультат: {proizvedenie}")`
-    },
-    {
-      title: 'Пример 2: Алгоритм обмена значений двух переменных',
-      code: `a = 10
-b = 25
-
-print(f"До обмена: a={a}, b={b}")
-
-# Трассируем обмен через временную переменную
-temp = a    # temp=10, a=10, b=25
-a = b       # temp=10, a=25, b=25
-b = temp    # temp=10, a=25, b=10
-
-print(f"После обмена: a={a}, b={b}")
-print()
-
-# Python позволяет обмен в одну строку:
-x, y = 5, 15
-print(f"До: x={x}, y={y}")
-x, y = y, x
-print(f"После: x={x}, y={y}")`
-    }
-  ],
-
-  tasks: [
-    {
-      prompt: 'Выполните трассировку следующего кода и определите итоговое значение переменной <code>result</code>. Затем запустите код, чтобы проверить свой ответ.<br><br><code>result = 0<br>for i in range(1, 6):<br>&nbsp;&nbsp;&nbsp;&nbsp;if i % 2 != 0:<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result += i</code><br><br>Ожидаемый ответ: <em>9</em> (1+3+5).',
-      starterCode: `# ваш код здесь
+print(f"Итог: s = {s}")`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Пройдите трассировку и запустите код: <pre style="background:var(--surface2);padding:8px;border-radius:6px;font-size:13px">result = 0\nfor i in range(1, 6):\n    if i % 2 != 0:\n        result += i\nprint(result)</pre>Ожидаемый ответ: <em>9</em> (сумма нечётных 1+3+5).',
+        starterCode: `# ваш код здесь
 `,
-      solution: `result = 0\nfor i in range(1, 6):\n    if i % 2 != 0:\n        result += i\nprint(result)`,
-      hint: 'Запустите код как есть — он уже работает. До запуска мысленно проследите: нечётные числа до 5 — это 1, 3, 5. Их сумма: 1+3+5=9.',
-      test: (out, code) => out.trim() === '9' && code.includes('for')
+        solution: `result = 0\nfor i in range(1, 6):\n    if i % 2 != 0:\n        result += i\nprint(result)`,
+        hint: 'Перепечатайте код из условия. Нечётные числа в range(1,6): 1, 3, 5. Их сумма: 9.',
+        test: (out, code) => out.trim() === '9' && code.includes('for')
+      }
     },
+
     {
-      prompt: 'Добавьте отладочный вывод, чтобы проследить каждый шаг цикла. Для чисел от 1 до 5 выводите строку вида <em>«i=1, квадрат=1»</em>. Последняя строка вывода должна быть <em>«i=5, квадрат=25»</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Отладочный вывод',
+      content: `
+<p>Чтобы отследить работу программы, добавляют временные <code>print()</code> для вывода промежуточных значений — это называется «отладочный вывод» (debug print):</p>
+<pre><code class="language-python">s = 0
+for i in range(1, 4):
+    print(f"До: i={i}, s={s}")  # отладка
+    s += i
+    print(f"После: s={s}")       # отладка
+print(f"Итог: {s}")</code></pre>`,
+      example: {
+        title: 'Трассировка умножения',
+        code: `p = 1
+for i in range(1, 6):
+    p *= i
+    print(f"i={i}, p={p}")
+print(f"5! = {p}")`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Напишите цикл для чисел от 1 до 5, который выводит строку вида <em>«i=1, квадрат=1»</em>. Последняя строка должна быть <em>«i=5, квадрат=25»</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `for i in range(1, 6):\n    kvadrat = i ** 2\n    print(f"i={i}, квадрат={kvadrat}")`,
-      hint: 'Шаблон строки уже задан в комментарии. Используйте f-строку и подставьте переменные <code>i</code> и <code>kvadrat</code> в нужные места. <code>kvadrat = i ** 2</code> уже вычислен.',
-      test: (out, code) => out.trim().endsWith('i=5, квадрат=25') && out.includes('i=1, квадрат=1')
+        solution: `for i in range(1, 6):\n    print(f"i={i}, квадрат={i**2}")`,
+        hint: 'Используйте f-строку: <code>print(f"i={i}, квадрат={i**2}")</code>.',
+        test: (out, code) => out.trim().endsWith('i=5, квадрат=25') && out.includes('i=1, квадрат=1')
+      }
     },
+
     {
-      prompt: 'Отследите алгоритм нахождения наибольшего общего делителя (НОД) методом Евклида для чисел <code>a=48</code> и <code>b=18</code>. Выведите каждый шаг и итоговый НОД. Ожидаемый ответ НОД: <em>6</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Алгоритм Евклида (НОД)',
+      content: `
+<p>Наибольший общий делитель (НОД) двух чисел — самый эффективный алгоритм Евклида: на каждом шаге <code>a</code> получает значение <code>b</code>, а <code>b</code> — остаток от <code>a / b</code>. Цикл заканчивается когда <code>b = 0</code>:</p>
+<pre><code class="language-python">a, b = 48, 18
+while b != 0:
+    a, b = b, a % b
+print(f"НОД = {a}")</code></pre>`,
+      example: {
+        title: 'НОД с трассировкой',
+        code: `a, b = 56, 98
+shag = 1
+while b != 0:
+    print(f"Шаг {shag}: a={a}, b={b}")
+    a, b = b, a % b
+    shag += 1
+print(f"НОД = {a}")`
+      },
+      task: {
+        xp: 15,
+        prompt: 'Реализуйте алгоритм Евклида для <code>a=48</code>, <code>b=18</code>. Выводите каждый шаг и в конце <em>«НОД = 6»</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `a = 48\nb = 18\nshag = 1\nwhile b != 0:\n    print(f"Шаг {shag}: a={a}, b={b}")\n    a, b = b, a % b\n    shag += 1\nprint(f"НОД = {a}")`,
-      hint: 'Код уже написан — просто запустите его. Алгоритм Евклида: на каждом шаге <code>a</code> получает значение <code>b</code>, а <code>b</code> — остаток от деления <code>a</code> на <code>b</code>. Цикл заканчивается, когда <code>b</code> становится 0.',
-      test: (out, code) => out.includes('НОД = 6') && code.includes('while')
+        solution: `a = 48\nb = 18\nshag = 1\nwhile b != 0:\n    print(f"Шаг {shag}: a={a}, b={b}")\n    a, b = b, a % b\n    shag += 1\nprint(f"НОД = {a}")`,
+        hint: 'Ключевая строка: <code>a, b = b, a % b</code> — одновременное присваивание.',
+        test: (out, code) => out.includes('НОД = 6') && code.includes('while')
+      }
+    },
+
+    {
+      heading: 'Практика: сумма цифр числа',
+      content: `<p>Классический алгоритм с трассировкой: разбить число на цифры через остаток от деления на 10.</p>`,
+      example: {
+        title: 'Цифры числа',
+        code: `n = 1234
+while n > 0:
+    cifra = n % 10
+    print(f"Цифра: {cifra}, n до: {n}")
+    n //= 10`
+      },
+      task: {
+        xp: 20,
+        practice: true,
+        prompt: 'Дано число <code>n = 12345</code>. Вычислите сумму его цифр и выведите результат. Ожидаемый ответ: <em>15</em>.',
+        starterCode: `# ваш код здесь
+`,
+        solution: `n = 12345\ns = 0\nwhile n > 0:\n    s += n % 10\n    n //= 10\nprint(s)`,
+        hint: '<code>n % 10</code> даёт последнюю цифру, <code>n //= 10</code> убирает её. Повторяй пока <code>n > 0</code>.',
+        test: (out, code) => out.trim() === '15' && code.includes('while')
+      }
     }
   ]
 };

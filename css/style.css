@@ -72,6 +72,127 @@ html, body {
   flex-shrink: 0;
 }
 
+/* ── XP / LEVEL ── */
+#level-summary {
+  padding: 10px 16px 8px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+#level-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+#level-badge {
+  background: var(--purple);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+#level-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+#xp-text {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+#xp-bar-container {
+  height: 5px;
+  background: var(--surface3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+#xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #a855f7, #7c5ef6);
+  border-radius: 3px;
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── XP POPUP ── */
+.xp-popup {
+  position: fixed;
+  bottom: 80px;
+  right: 24px;
+  background: var(--surface2);
+  border: 1px solid var(--purple);
+  color: var(--purple);
+  font-weight: 700;
+  font-size: 15px;
+  padding: 10px 18px;
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(124,94,246,0.3);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.xp-popup.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.xp-popup.levelup {
+  background: linear-gradient(135deg, #7c5ef6, #a855f7);
+  color: #fff;
+  border-color: transparent;
+  font-size: 14px;
+}
+
+/* ── XP BADGE on task label ── */
+.xp-badge {
+  margin-left: 8px;
+  background: rgba(124, 94, 246, 0.15);
+  color: var(--purple);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+/* ── LOCKED TOPICS ── */
+.nav-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nav-item.locked:hover {
+  background: transparent;
+}
+
+/* ── PRACTICE LOCK ── */
+.sp-practice-lock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(124, 94, 246, 0.06);
+  border: 1px dashed rgba(124, 94, 246, 0.3);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 12px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.sp-practice-lock span { font-size: 22px; flex-shrink: 0; }
+.sp-practice-lock p { margin: 0; line-height: 1.5; }
+
 #progress-summary {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);

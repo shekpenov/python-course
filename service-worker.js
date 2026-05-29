@@ -1,4 +1,4 @@
-const CACHE_NAME = 'python-course-v6';
+const CACHE_NAME = 'python-course-v7';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -28,7 +28,7 @@ const STATIC_ASSETS = [
   '/modules/topic-10513.js'
 ];
 
-const CDN_CACHE_NAME = 'python-course-cdn-v6';
+const CDN_CACHE_NAME = 'python-course-cdn-v7';
 const CDN_ORIGINS = [
   'fonts.googleapis.com',
   'fonts.gstatic.com',

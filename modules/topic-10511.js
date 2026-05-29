@@ -2,112 +2,140 @@ export default {
   id: 'topic-10511',
   code: '10.5.1.1',
   title: 'Функции и процедуры в Python',
+  layout: 'single',
 
-  theory: `
-<h2>Что такое функция?</h2>
-<p>Функция — это именованный блок кода, который можно вызвать в любом месте программы. Функции позволяют избежать дублирования кода, разделить программу на логические части и упростить её отладку. В Python все функции определяются с помощью ключевого слова <code>def</code>.</p>
-
-<h2>Определение и вызов функции</h2>
-<pre><code class="language-python">def pozdravlenie(imya):    # определение функции
-    """Выводит приветствие."""
-    print(f"Привет, {imya}!")
-
-pozdravlenie("Алия")     # вызов функции → Привет, Алия!
-pozdravlenie("Данияр")   # ещё один вызов</code></pre>
-
-<h2>Параметры и аргументы</h2>
-<p>Функция может принимать <strong>параметры</strong> (в определении) и получать <strong>аргументы</strong> (при вызове). Можно задавать значения по умолчанию:</p>
-<pre><code class="language-python">def step(base, exp=2):   # exp по умолчанию равен 2
-    return base ** exp
-
-print(step(3))    # 9  — exp=2 по умолчанию
-print(step(3, 3)) # 27 — exp=3</code></pre>
-
-<h2>Возвращаемое значение (return)</h2>
-<p>Оператор <code>return</code> завершает функцию и возвращает значение вызывающему коду. Функция без <code>return</code> возвращает <code>None</code>. Можно вернуть несколько значений через запятую (они упаковываются в кортеж):</p>
-<pre><code class="language-python">def min_max(lst):
-    return min(lst), max(lst)
-
-mn, mx = min_max([3, 1, 7, 2])
-print(mn, mx)   # 1  7</code></pre>
-
-<h2>Область видимости (scope)</h2>
-<p>Переменные, созданные внутри функции, — <strong>локальные</strong> и не видны снаружи. Переменные вне функции — <strong>глобальные</strong>. Для изменения глобальной переменной внутри функции используют <code>global</code>, но злоупотреблять этим не стоит.</p>
-
-<div class="tip"><strong>Хорошая практика:</strong> функция должна делать одну вещь и делать её хорошо. Давайте функциям глагольные названия: <code>calculate_sum</code>, <code>find_max</code>, <code>is_prime</code>.</div>
-`,
-
-  examples: [
+  sections: [
     {
-      title: 'Пример 1: Функции для математических вычислений',
-      code: `def square(x):
-    """Возвращает квадрат числа."""
+      heading: 'Зачем нужны функции',
+      content: `
+<p>Функция — именованный блок кода, который можно вызывать в любом месте программы. Функции избавляют от копирования кода и разбивают программу на логические части.</p>
+<pre><code class="language-python">def имя_функции(параметр1, параметр2):
+    """Описание что делает функция."""
+    # тело функции
+    return результат    # необязательно</code></pre>
+<pre><code class="language-python">def kvadrat(x):
     return x ** 2
 
-def cube(x):
-    """Возвращает куб числа."""
-    return x ** 3
+print(kvadrat(5))   # 25
+print(kvadrat(10))  # 100</code></pre>`,
+      example: {
+        title: 'Несколько математических функций',
+        code: `def square(x): return x ** 2
+def cube(x):   return x ** 3
 
-def factorial(n):
-    """Вычисляет факториал n."""
+def is_even(n):
+    return n % 2 == 0
+
+for n in range(1, 6):
+    print(f"n={n}: x²={square(n)}, x³={cube(n)}, чётное={is_even(n)}")`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Напишите функцию <code>power(base, exp)</code>, которая вычисляет <code>base</code> в степени <code>exp</code> с помощью цикла (без <code>**</code>). Вызовите <code>power(2, 10)</code>. Ожидаемый ответ: <em>1024</em>.',
+        starterCode: `# ваш код здесь
+`,
+        solution: `def power(base, exp):\n    result = 1\n    for _ in range(exp):\n        result *= base\n    return result\nprint(power(2, 10))`,
+        hint: 'Внутри функции: <code>result = 1</code>, цикл <code>for _ in range(exp)</code>, <code>result *= base</code>.',
+        test: (out, code) => out.trim() === '1024' && code.includes('def power') && code.includes('power(')
+      }
+    },
+
+    {
+      heading: 'Параметры и return',
+      content: `
+<p>Функция может принимать несколько параметров и возвращать несколько значений. Параметры со значением по умолчанию необязательны при вызове:</p>
+<pre><code class="language-python">def step(base, exp=2):   # exp=2 по умолчанию
+    return base ** exp
+
+print(step(3))     # 9  (exp=2 по умолчанию)
+print(step(3, 3))  # 27 (exp=3)</code></pre>
+<pre><code class="language-python">def min_max(lst):
+    return min(lst), max(lst)   # вернуть два значения
+
+mn, mx = min_max([3, 1, 7, 2])
+print(mn, mx)   # 1  7</code></pre>`,
+      example: {
+        title: 'Функция для таблицы умножения',
+        code: `def tablitsa(n, do=10):
+    for i in range(1, do+1):
+        print(f"{n} × {i} = {n*i}")
+
+tablitsa(7)        # таблица на 7 до 10
+print()
+tablitsa(5, do=5)  # таблица на 5 до 5`
+      },
+      task: {
+        xp: 10,
+        prompt: 'Напишите функцию <code>is_palindrome(s)</code>, которая возвращает <code>True</code> если строка является палиндромом. Проверьте <code>"радар"</code>. Ожидаемый ответ: <em>True</em>.',
+        starterCode: `# ваш код здесь
+`,
+        solution: `def is_palindrome(s):\n    return s == s[::-1]\nprint(is_palindrome("радар"))`,
+        hint: 'Обратная строка: <code>s[::-1]</code>. Сравни строку с её обратной копией.',
+        test: (out, code) => out.trim() === 'True' && code.includes('def is_palindrome') && code.includes('is_palindrome(')
+      }
+    },
+
+    {
+      heading: 'Область видимости',
+      content: `
+<p>Переменные внутри функции — <strong>локальные</strong>, они не видны снаружи. Переменные вне функции — <strong>глобальные</strong>:</p>
+<pre><code class="language-python">x = 10  # глобальная
+
+def foo():
+    x = 99  # локальная, не влияет на глобальную
+    print(x)  # 99
+
+foo()
+print(x)  # 10 — глобальная не изменилась</code></pre>`,
+      example: {
+        title: 'Рекурсия — функция вызывает себя',
+        code: `def factorial(n):
     if n <= 1:
         return 1
-    result = 1
-    for i in range(2, n + 1):
-        result *= i
-    return result
+    return n * factorial(n - 1)  # вызов самой себя
 
-# Используем функции
-for n in range(1, 6):
-    print(f"n={n}: n²={square(n)}, n³={cube(n)}, n!={factorial(n)}")`
-    },
-    {
-      title: 'Пример 2: Рекурсивная функция — числа Фибоначчи',
-      code: `def fibonacci(n):
-    """Возвращает n-е число Фибоначчи рекурсивно."""
-    if n <= 1:
-        return n
-    return fibonacci(n - 1) + fibonacci(n - 2)
-
-def fibonacci_iter(n):
-    """Возвращает n-е число Фибоначчи итеративно (эффективнее)."""
-    if n <= 1:
-        return n
-    a, b = 0, 1
-    for _ in range(2, n + 1):
-        a, b = b, a + b
-    return b
-
-print("Первые 10 чисел Фибоначчи:")
-for i in range(10):
-    print(f"F({i}) = {fibonacci_iter(i)}")`
-    }
-  ],
-
-  tasks: [
-    {
-      prompt: 'Напишите функцию <code>power(base, exp)</code>, которая вычисляет <code>base</code> в степени <code>exp</code> с помощью цикла (не используйте <code>**</code>). Вызовите <code>power(2, 10)</code> и выведите результат. Ожидаемый ответ: <em>1024</em>.',
-      starterCode: `# ваш код здесь
+for i in range(1, 8):
+    print(f"{i}! = {factorial(i)}")`
+      },
+      task: {
+        xp: 15,
+        prompt: 'Напишите функцию <code>count_vowels(s)</code>, которая подсчитывает гласные буквы (а е ё и о у ы э ю я). Проверьте на <code>"Программирование"</code>. Ожидаемый ответ: <em>7</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `def power(base, exp):\n    result = 1\n    for _ in range(exp):\n        result *= base\n    return result\nprint(power(2, 10))`,
-      hint: 'Внутри функции используйте цикл <code>for _ in range(exp)</code> и умножайте <code>result *= base</code> на каждой итерации. Начальное значение <code>result = 1</code> важно — умножение на 0 даст 0.',
-      test: (out, code) => out.trim() === '1024' && code.includes('def power') && code.includes('power(')
+        solution: `def count_vowels(s):\n    glasnye = "аеёиоуыэюяАЕЁИОУЫЭЮЯ"\n    count = 0\n    for ch in s:\n        if ch in glasnye:\n            count += 1\n    return count\nprint(count_vowels("Программирование"))`,
+        hint: 'Создай строку <code>glasnye</code> со всеми гласными. Для каждого символа: <code>if ch in glasnye</code>.',
+        test: (out, code) => out.trim() === '7' && code.includes('def count_vowels') && code.includes('count_vowels(')
+      }
     },
+
     {
-      prompt: 'Напишите функцию <code>is_palindrome(s)</code>, которая возвращает <code>True</code>, если строка является палиндромом (читается одинаково слева направо и справа налево). Проверьте слово <code>"радар"</code> и выведите результат. Ожидаемый ответ: <em>True</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Практика: максимум трёх чисел',
+      content: `<p>Функция, которая принимает аргументы и возвращает результат — основа программирования.</p>`,
+      task: {
+        xp: 20,
+        practice: true,
+        prompt: 'Напишите функцию <code>max3(a, b, c)</code>, которая возвращает наибольшее из трёх чисел (без <code>max()</code>). Проверьте на <code>max3(8, 3, 11)</code>. Ожидаемый ответ: <em>11</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `def is_palindrome(s):\n    return s == s[::-1]\nresult = is_palindrome("радар")\nprint(result)`,
-      hint: 'Обратная копия строки в Python записывается через срез: <code>s[::-1]</code>. Если строка равна своей обратной копии — она палиндром. Код почти готов, просто запустите.',
-      test: (out, code) => out.trim() === 'True' && code.includes('def is_palindrome') && code.includes('is_palindrome(')
+        solution: `def max3(a, b, c):\n    m = a\n    if b > m:\n        m = b\n    if c > m:\n        m = c\n    return m\nprint(max3(8, 3, 11))`,
+        hint: 'Начни с <code>m = a</code>. Если <code>b > m</code> — обнови m. Если <code>c > m</code> — снова обнови.',
+        test: (out, code) => out.trim() === '11' && code.includes('def max3') && code.includes('max3(')
+      }
     },
+
     {
-      prompt: 'Напишите функцию <code>count_vowels(s)</code>, которая подсчитывает количество гласных букв (а, е, ё, и, о, у, ы, э, ю, я) в строке. Проверьте на строке <code>"Программирование"</code> и выведите результат. Ожидаемый ответ: <em>7</em>.',
-      starterCode: `# ваш код здесь
+      heading: 'Практика: сумма цифр',
+      content: `<p>Функция + алгоритм работы с числами.</p>`,
+      task: {
+        xp: 25,
+        practice: true,
+        prompt: 'Напишите функцию <code>summa_cifr(n)</code>, которая вычисляет сумму цифр числа. Проверьте на <code>summa_cifr(12345)</code>. Ожидаемый ответ: <em>15</em>.',
+        starterCode: `# ваш код здесь
 `,
-      solution: `def count_vowels(s):\n    glasnye = "аеёиоуыэюяАЕЁИОУЫЭЮЯ"\n    count = 0\n    for ch in s:\n        if ch in glasnye:\n            count += 1\n    return count\nprint(count_vowels("Программирование"))`,
-      hint: 'Оператор <code>in</code> проверяет, входит ли символ в строку: <code>if ch in glasnye</code>. Строка <code>glasnye</code> уже содержит все гласные в обоих регистрах. Код готов — проанализируйте и запустите.',
-      test: (out, code) => out.trim() === '7' && code.includes('def count_vowels') && code.includes('count_vowels(')
+        solution: `def summa_cifr(n):\n    s = 0\n    while n > 0:\n        s += n % 10\n        n //= 10\n    return s\nprint(summa_cifr(12345))`,
+        hint: '<code>n % 10</code> — последняя цифра, <code>n //= 10</code> — убирает её. Повторяй пока n > 0.',
+        test: (out, code) => out.trim() === '15' && code.includes('def summa_cifr') && code.includes('summa_cifr(')
+      }
     }
   ]
 };
