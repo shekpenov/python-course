@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#7c5ef6">
+  <meta name="description" content="Интерактивный курс Python для школьников. Учитесь программировать прямо в браузере.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Python Учебник</title>
+</head>
+<body>
+  <div id="app">
+
+    <button id="menu-toggle" aria-label="Открыть меню">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
+    <aside id="sidebar">
+      <div id="sidebar-header">
+        <svg class="logo-icon" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+          <rect width="40" height="40" rx="10" fill="#7c5ef6"/>
+          <path d="M20 6c-4.4 0-7 2-7 5v3h7v1H11c-2 0-3.5 1.5-3.5 3.5v5c0 2 1.5 3.5 3.5 3.5h2v-3.5c0-2 1.5-3.5 3.5-3.5h5c2 0 3.5-1.5 3.5-3.5V11c0-2-1.5-3.5-3.5-3.5h-2zM17 9.5a1.2 1.2 0 110-2.4 1.2 1.2 0 010 2.4z" fill="white"/>
+          <path d="M20 34c4.4 0 7-2 7-5v-3h-7v-1h9c2 0 3.5-1.5 3.5-3.5v-5c0-2-1.5-3.5-3.5-3.5h-2v3.5c0 2-1.5 3.5-3.5 3.5h-5c-2 0-3.5 1.5-3.5 3.5V29c0 2 1.5 3.5 3.5 3.5h2zM23 30.5a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" fill="#ffd43b"/>
+        </svg>
+        <span>Python Курс</span>
+      </div>
+
+      <div id="progress-summary">
+        <div id="progress-bar-container">
+          <div id="progress-bar"></div>
+        </div>
+        <span id="progress-text">0 / 15 тем завершено</span>
+      </div>
+
+      <nav id="topic-nav"></nav>
+    </aside>
+
+    <div id="sidebar-overlay"></div>
+
+    <main id="main-content">
+      <div id="home-view">
+        <div class="welcome-card">
+          <div class="welcome-icon">🐍</div>
+          <h1>Добро пожаловать в курс Python</h1>
+          <p>Интерактивный курс программирования на Python. Выберите тему в боковом меню, чтобы начать. Запускайте код прямо в браузере — без установки!</p>
+          <div class="features">
+            <div class="feature"><span class="feature-icon">📖</span><span>Теория с примерами</span></div>
+            <div class="feature"><span class="feature-icon">▶️</span><span>Запуск кода в браузере</span></div>
+            <div class="feature"><span class="feature-icon">✅</span><span>Практические задания</span></div>
+            <div class="feature"><span class="feature-icon">📊</span><span>Отслеживание прогресса</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="topic-view" hidden>
+        <div id="topic-header">
+          <div id="topic-code-badge"></div>
+          <h1 id="topic-title"></h1>
+        </div>
+
+        <div id="tab-bar">
+          <button class="tab-btn active" data-tab="theory">📖 Теория</button>
+          <button class="tab-btn" data-tab="examples">💡 Примеры</button>
+          <button class="tab-btn" data-tab="practice">✏️ Практика</button>
+        </div>
+
+        <div id="tab-theory" class="tab-panel active">
+          <div id="theory-content"></div>
+        </div>
+
+        <div id="tab-examples" class="tab-panel">
+          <div id="examples-content"></div>
+        </div>
+
+        <div id="tab-practice" class="tab-panel">
+          <div id="practice-content"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="pyodide-loading" hidden>
+    <div class="loading-card">
+      <div id="pyodide-spinner" class="spinner"></div>
+      <p id="pyodide-status">Загрузка Python...</p>
+      <small id="pyodide-hint">Первый запуск может занять ~15 секунд</small>
+      <button id="pyodide-close" class="loading-close" onclick="document.getElementById('pyodide-loading').hidden=true" hidden>✕ Закрыть</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-python.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(regs => {
+        regs.forEach(r => r.unregister());
+      });
+    }
+  </script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
