@@ -133,10 +133,12 @@ async function loadTopic(topicId) {
       document.getElementById('tab-theory').classList.add('active');
       renderSinglePage(currentTopic);
     } else {
+      const hasExamples = currentTopic.examples && currentTopic.examples.length > 0;
       document.getElementById('tab-bar').hidden = false;
+      document.querySelector('[data-tab="examples"]').hidden = !hasExamples;
       switchTab('theory');
       renderTheory(currentTopic);
-      renderExamples(currentTopic);
+      if (hasExamples) renderExamples(currentTopic);
       renderPractice(currentTopic);
     }
   } catch (err) {
