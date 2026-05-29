@@ -31,7 +31,7 @@ print(f"Имя: {name}, длина имени: {len(name)}")`
 `,
         solution: `name = "Алия"\nage = 16\nprint(f"Имя: {name}, возраст: {age}")`,
         hint: 'Используйте f-строку: <code>print(f"Имя: {name}, возраст: {age}")</code>. Фигурные скобки <code>{}</code> подставляют значение переменной.',
-        test: (out, code) => out.trim().startsWith('Имя:') && out.includes('16') && (code.includes('f"') || code.includes("f'"))
+        test: (out, code) => out.trim().startsWith('Имя:') && out.includes('возраст:') && (code.includes('f"') || code.includes("f'"))
       }
     },
 
